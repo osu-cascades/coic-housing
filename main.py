@@ -80,10 +80,10 @@ CROOK = '013'
 JEFFERSON = '031'
 
 # FINAL_URL = https://api.census.gov/data/2018/acs/acs5?get=B25070_010E&for=county:*&in=state:41
-# this string will get the population of individuals that pay 50% or more of their income
+# this string will get the population of individuals that pay 30 - 50% of their income
 # in rent for all counties in oregon.
-# It returns a list of lists. The first list containing meta data and the following lists containing the requested info.
-# i.e. one list being ['5690', '41', '047'], meaning 5690 people spend 50% or more of their income on rent in the county 047 (FIPS code for Marion county) in the state 41 (FIPS code for Oregon)
+# i.e. one list being ['5690', '41', '047'], meaning 5690 people spend 50% or more of 
+# their income on rent in the county 047 (FIPS code for Marion county) in the state 41 (FIPS code for Oregon)
 FINAL_URL = BASE_URL \
     + GET + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
     + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
@@ -106,7 +106,7 @@ wb = api.open('COIC-dashboard')
 sheet = wb.worksheet_by_title('raw burden data')
 sheet.set_dataframe(df, (1,1))
 
-# household incomes for all counties in OR
+# household incomes for all counties in OR used in income histogram
 df = pd.DataFrame()
 NUM_HOUSEHOLD_INCOME_VARIABLES = 17
 for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
@@ -119,28 +119,29 @@ for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
     values = r.json()
     #labels
     df[("200" if i < 10  else '20') + str(i)] = values
-sheet = wb.worksheet_by_title('raw time data')
+sheet = wb.worksheet_by_title('raw household income data')
 # TODO drop row 0 in future. Keeping for now for refrence
 sheet.set_dataframe(df, (1,1))
 
+df = pd.DataFrame()
+#historic rent burdening data used in linear regression viz
+for i in range(2011,2019):
+    FINAL_URL =  URL + str(i) + '/' + DATA_SET\
+    + GET + TOTAL_POPULATION_BURDENED + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_40_49\
+    + COMMA + MED_GROSS_RENT_DOLLARS\
+    + FOR + COUNTY + DESCHUTES + COMMA\
+    + JEFFERSON + COMMA + CROOK \
+    + IN + STATE + OREGON
 
+    r = requests.get(url=FINAL_URL + API_KEY)
+    values = r.json()
+    df[str(i)] = values
 
-# trends = {}
-# for i in range(2011,2019):
-#     FINAL_URL =  URL + str(i) + '/' + DATA_SET\
-#     + GET + TOTAL_POPULATION_BURDENED + COMMA + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
-#     + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA + GROSS_RENT_PERCENT_INCOME_40_49\
-#     + COMMA + MED_GROSS_RENT_DOLLARS\
-#     + FOR + COUNTY + "*" \
-#     + IN + STATE + OREGON
-
-#     r = requests.get(url=FINAL_URL + API_KEY)
-#     values = r.json()
-#     for i in range(1, len(values)):
-#         trends[fips_codes[values[i][7]]].append(100 * (int(values[i][1])/int(values[i][0])))
-#         trends[fips_codes[values[i][7]]].append(100 * ((int(values[i][2])) + (int(values[i][3])) + (int(values[i][4])))/int(values[i][0]))
-#         trends[fips_codes[values[i][7]]].append(int(values[i][5]))
-
-
-# df_route = pd.read_csv('https://openmv.net/file/travel-times.csv')
-# sheet.set_dataframe(df_route, (1,1))
+sheet = wb.worksheet_by_title('raw historic burdening data')
+# TODO drop row 0 in future. Keeping for now for refrence
+sheet.set_dataframe(df, (1,1))
+    
