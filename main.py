@@ -10,9 +10,6 @@ import pandas as pd
 
 #google auth stuff
 api = pygsheets.authorize()
-#gsheet
-wb = api.open('TEST')
-sheet = wb.worksheet_by_title('Sheet2')
 
 fips_codes = {
     "001": "Baker",
@@ -93,38 +90,39 @@ FINAL_URL = BASE_URL \
     + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_40_49 + COMMA\
     + TOTAL_POPULATION_BURDENED\
-    + FOR + COUNTY + DESCHUTES + COMMA\
-    + CROOK + COMMA + JEFFERSON\
+    + FOR + COUNTY + '*'\
     + IN + STATE + OREGON
 
 r = requests.get(url=FINAL_URL + API_KEY)
 # values is the return value from the census  API
 values = r.json()
-df = pd.DataFrame(values, index=['label', 'Jefferson', 'Deschutes', 'Crook'])
+df = pd.DataFrame(values)
 df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS','GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # pandas return copies so you must place it in a variable
-df = df.drop('label')
-print(df)
-household_incomes = {}
-# NUM_HOUSEHOLD_INCOME_VARIABLES = 17
-# for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
-#     # B19001_00 + i + E is a range of income variables in the acs5
-#     FINAL_URL = BASE_URL \
-#         + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
-#         + FOR + COUNTY + "*" \
-#         + IN + STATE + OREGON
-#     r = requests.get(url=FINAL_URL + API_KEY)
-#     values = r.json()
-#     # get number of individuals in ith bracket and match with respective key
-#     for i in range(1, len(values)):
-        # add to household_income the value which matches the fips value which matches the key in fips_codes
-        # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
-        # fips_codes[047] = Marion
-        # int(values[1][0]) = 5690
-        # household_incomes[Marion].append(int(5690)
-        # household_incom = {Marion: [5690]}
-        # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
-# print(household_incomes)
+df = df.drop([0])
+# print(df)
+# #gsheet
+wb = api.open('COIC-dashboard')
+sheet = wb.worksheet_by_title('raw burden data')
+sheet.set_dataframe(df, (1,1))
+
+# household incomes for all counties in OR
+df = pd.DataFrame()
+NUM_HOUSEHOLD_INCOME_VARIABLES = 17
+for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
+    # B19001_00 + i + E is a range of income variables in the acs5
+    FINAL_URL = BASE_URL \
+        + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
+        + FOR + COUNTY + "*" \
+        + IN + STATE + OREGON
+    r = requests.get(url=FINAL_URL + API_KEY)
+    values = r.json()
+    #labels
+    df[("200" if i < 10  else '20') + str(i)] = values
+sheet = wb.worksheet_by_title('raw time data')
+# TODO drop row 0 in future. Keeping for now for refrence
+sheet.set_dataframe(df, (1,1))
+
 
 
 # trends = {}
