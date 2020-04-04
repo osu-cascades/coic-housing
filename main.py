@@ -4,7 +4,16 @@
 #on this code, I am sorry and may  god have mercy on your soul.
 import requests
 import config
-import xlsxwriter
+# import xlsxwriter
+import pygsheets
+import pandas as pd
+
+#google auth stuff
+api = pygsheets.authorize()
+#gsheet
+wb = api.open('TEST')
+sheet = wb.worksheet_by_title('Sheet2')
+sheet.set_dataframe(df, (1,1))
 
 fips_codes = {
     "001": "Baker",
