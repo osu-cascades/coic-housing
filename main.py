@@ -93,14 +93,15 @@ FINAL_URL = BASE_URL \
     + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_40_49 + COMMA\
     + TOTAL_POPULATION_BURDENED\
-    + FOR + COUNTY + "*" \
+    + FOR + COUNTY + DESCHUTES + COMMA\
+    + CROOK + COMMA + JEFFERSON\
     + IN + STATE + OREGON
 
 r = requests.get(url=FINAL_URL + API_KEY)
 # values is the return value from the census  API
 values = r.json()
 print(values)
-# household_incomes = {}
+household_incomes = {}
 # NUM_HOUSEHOLD_INCOME_VARIABLES = 17
 # for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
 #     # B19001_00 + i + E is a range of income variables in the acs5
@@ -112,13 +113,14 @@ print(values)
 #     values = r.json()
 #     # get number of individuals in ith bracket and match with respective key
 #     for i in range(1, len(values)):
-#         # add to household_income the value which matches the fips value which matches the key in fips_codes
-#         # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
-#         # fips_codes[047] = Marion
-#         # int(values[1][0]) = 5690
-#         # household_incomes[Marion].append(int(5690)
-#         # household_incom = {Marion: [5690]}
-#         household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
+        # add to household_income the value which matches the fips value which matches the key in fips_codes
+        # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
+        # fips_codes[047] = Marion
+        # int(values[1][0]) = 5690
+        # household_incomes[Marion].append(int(5690)
+        # household_incom = {Marion: [5690]}
+        # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
+# print(household_incomes)
 
 
 # trends = {}
