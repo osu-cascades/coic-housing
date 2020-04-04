@@ -13,7 +13,8 @@ api = pygsheets.authorize()
 #gsheet
 wb = api.open('TEST')
 sheet = wb.worksheet_by_title('Sheet2')
-sheet.set_dataframe(df, (1,1))
+df_route = pd.read_csv('https://openmv.net/file/travel-times.csv')
+sheet.set_dataframe(df_route, (1,1))
 
 fips_codes = {
     "001": "Baker",
