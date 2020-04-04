@@ -100,7 +100,11 @@ FINAL_URL = BASE_URL \
 r = requests.get(url=FINAL_URL + API_KEY)
 # values is the return value from the census  API
 values = r.json()
-print(values)
+df = pd.DataFrame(values, index=['label', 'Jefferson', 'Deschutes', 'Crook'])
+df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS','GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
+# pandas return copies so you must place it in a variable
+df = df.drop('label')
+print(df)
 household_incomes = {}
 # NUM_HOUSEHOLD_INCOME_VARIABLES = 17
 # for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
