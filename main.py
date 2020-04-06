@@ -60,6 +60,7 @@ GET = '?get='
 MED_GROSS_RENT = 'B25064_001E'
 MED_GROSS_RENT_DOLLARS = 'B25064_001E'
 GROSS_RENT_TOTAL = 'B25063_001E'
+GROSS_RENT_PERCENT_INCOME_25_30 = 'B25070_006E'
 GROSS_RENT_PERCENT_INCOME_30_34 = 'B25070_007E'
 GROSS_RENT_PERCENT_INCOME_35_39 = 'B25070_008E'
 GROSS_RENT_PERCENT_INCOME_40_49 = 'B25070_009E'
@@ -100,48 +101,52 @@ df = pd.DataFrame(values)
 df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS','GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # pandas return copies so you must place it in a variable
 df = df.drop([0])
-# print(df)
 # #gsheet
-wb = api.open('COIC-dashboard')
-sheet = wb.worksheet_by_title('raw burden data')
-sheet.set_dataframe(df, (1,1))
+# wb = api.open('COIC-dashboard')
+# sheet = wb.worksheet_by_title('raw burden data')
+# sheet.set_dataframe(df, (1,1))
+print(df)
+trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
+# trans_df['POPULATION RENT BURDENED'] = 
+# print(trans_df)
 
-# household incomes for all counties in OR used in income histogram
-df = pd.DataFrame()
-NUM_HOUSEHOLD_INCOME_VARIABLES = 17
-for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
-    # B19001_00 + i + E is a range of income variables in the acs5
-    FINAL_URL = BASE_URL \
-        + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
-        + FOR + COUNTY + "*" \
-        + IN + STATE + OREGON
-    r = requests.get(url=FINAL_URL + API_KEY)
-    values = r.json()
-    #labels
-    df[("200" if i < 10  else '20') + str(i)] = values
-sheet = wb.worksheet_by_title('raw household income data')
-# TODO drop row 0 in future. Keeping for now for refrence
-sheet.set_dataframe(df, (1,1))
 
-df = pd.DataFrame()
-#historic rent burdening data used in linear regression viz
-for i in range(2011,2019):
-    FINAL_URL =  URL + str(i) + '/' + DATA_SET\
-    + GET + TOTAL_POPULATION_BURDENED + COMMA\
-    + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
-    + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
-    + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
-    + GROSS_RENT_PERCENT_INCOME_40_49\
-    + COMMA + MED_GROSS_RENT_DOLLARS\
-    + FOR + COUNTY + DESCHUTES + COMMA\
-    + JEFFERSON + COMMA + CROOK \
-    + IN + STATE + OREGON
+# # household incomes for all counties in OR used in income histogram
+# df = pd.DataFrame()
+# NUM_HOUSEHOLD_INCOME_VARIABLES = 17
+# for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
+#     # B19001_00 + i + E is a range of income variables in the acs5
+#     FINAL_URL = BASE_URL \
+#         + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
+#         + FOR + COUNTY + "*" \
+#         + IN + STATE + OREGON
+#     r = requests.get(url=FINAL_URL + API_KEY)
+#     values = r.json()
+#     #labels
+#     df[("200" if i < 10  else '20') + str(i)] = values
+# sheet = wb.worksheet_by_title('raw household income data')
+# # TODO drop row 0 in future. Keeping for now for refrence
+# sheet.set_dataframe(df, (1,1))
 
-    r = requests.get(url=FINAL_URL + API_KEY)
-    values = r.json()
-    df[str(i)] = values
+# df = pd.DataFrame()
+# #historic rent burdening data used in linear regression viz
+# for i in range(2011,2019):
+#     FINAL_URL =  URL + str(i) + '/' + DATA_SET\
+#     + GET + TOTAL_POPULATION_BURDENED + COMMA\
+#     + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
+#     + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
+#     + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
+#     + GROSS_RENT_PERCENT_INCOME_40_49\
+#     + COMMA + MED_GROSS_RENT_DOLLARS\
+#     + FOR + COUNTY + DESCHUTES + COMMA\
+#     + JEFFERSON + COMMA + CROOK \
+#     + IN + STATE + OREGON
 
-sheet = wb.worksheet_by_title('raw historic burdening data')
-# TODO drop row 0 in future. Keeping for now for refrence
-sheet.set_dataframe(df, (1,1))
+#     r = requests.get(url=FINAL_URL + API_KEY)
+#     values = r.json()
+#     df[str(i)] = values
+
+# sheet = wb.worksheet_by_title('raw historic burdening data')
+# # TODO drop row 0 in future. Keeping for now for refrence
+# sheet.set_dataframe(df, (1,1))
     
