@@ -87,6 +87,7 @@ JEFFERSON = '031'
 # their income on rent in the county 047 (FIPS code for Marion county) in the state 41 (FIPS code for Oregon)
 FINAL_URL = BASE_URL \
     + GET + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_25_30 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_40_49 + COMMA\
@@ -98,17 +99,23 @@ r = requests.get(url=FINAL_URL + API_KEY)
 # values is the return value from the census  API
 values = r.json()
 df = pd.DataFrame(values)
-df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS','GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
+df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # pandas return copies so you must place it in a variable
 df = df.drop([0])
-# #gsheet
-# wb = api.open('COIC-dashboard')
-# sheet = wb.worksheet_by_title('raw burden data')
-# sheet.set_dataframe(df, (1,1))
-print(df)
+
 trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
-# trans_df['POPULATION RENT BURDENED'] = 
-# print(trans_df)
+trans_df['POPULATION RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+trans_df['POPULATION SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+# get percents from floats
+trans_df['POPULATION SEVERLY RENT BURDENED'] = trans_df['POPULATION SEVERLY RENT BURDENED'] * 100
+trans_df['POPULATION RENT BURDENED'] = trans_df['POPULATION RENT BURDENED'] * 100
+
+trans_df['COUNTY FIPS'] = df['county']
+trans_df['COUNTY NAME'] = df['county'].map(fips_codes)
+# #gsheet
+wb = api.open('COIC-dashboard')
+sheet = wb.worksheet_by_title('viz burden data')
+sheet.set_dataframe(trans_df, (1,1))
 
 
 # # household incomes for all counties in OR used in income histogram
