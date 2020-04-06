@@ -1,7 +1,9 @@
-#This is a deprecated and downright shitty codebase. There are a billion seperate requests that should be refactored.
-#It was done quick and dirty to get things off the ground and  working. My work partners repo should house 
-#the updated codebase that removes a ton of crap. If, for some reason, you are relying
-#on this code, I am sorry and may  god have mercy on your soul.
+# This codebase is a rework of an original I worked on that pulled the data from the census, manually transformed it,
+# and stored it in excel. This new code gets user input for census acs years, pulls the data,
+# transforms with pandas (sooooo much easier), and saves to GSheets. With Tableau public (not desktop!),
+# you can have your data automatically sync (every 24 hours it updates but can be done manually).
+# The goal here was to make things as hands off for the client as they aren't very technically proficient.
+# For questions, comments, concerns email taymal1987@gmail.com
 import requests
 import config
 # import xlsxwriter
