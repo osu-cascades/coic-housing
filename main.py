@@ -104,13 +104,16 @@ df = pd.DataFrame(values)
 df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # pandas return copies so you must place it in a variable
 df = df.drop([0])
+wb = api.open('COIC-dashboard')
+sheet = wb.worksheet_by_title('raw burden data')
+sheet.set_dataframe(df, (1,1))
 
 trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
-trans_df['POPULATION RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
-trans_df['POPULATION SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+trans_df['PERCENT SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
 # get percents from floats
-trans_df['POPULATION SEVERLY RENT BURDENED'] = trans_df['POPULATION SEVERLY RENT BURDENED'] * 100
-trans_df['POPULATION RENT BURDENED'] = trans_df['POPULATION RENT BURDENED'] * 100
+trans_df['PERCENT SEVERLY RENT BURDENED'] = trans_df['PERCENT SEVERLY RENT BURDENED'] * 100
+trans_df['PERCENT RENT BURDENED'] = trans_df['PERCENT RENT BURDENED'] * 100
 
 trans_df['COUNTY FIPS'] = df['county']
 trans_df['COUNTY NAME'] = df['county'].map(fips_codes)
@@ -121,18 +124,18 @@ sheet.set_dataframe(trans_df, (1,1))
 
 
 # # household incomes for all counties in OR used in income histogram
-# df = pd.DataFrame()
-# NUM_HOUSEHOLD_INCOME_VARIABLES = 17
-# for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
-#     # B19001_00 + i + E is a range of income variables in the acs5
-#     FINAL_URL = BASE_URL \
-#         + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
-#         + FOR + COUNTY + "*" \
-#         + IN + STATE + OREGON
-#     r = requests.get(url=FINAL_URL + API_KEY)
-#     values = r.json()
-#     #labels
-#     df[("200" if i < 10  else '20') + str(i)] = values
+df = pd.DataFrame()
+NUM_HOUSEHOLD_INCOME_VARIABLES = 17
+for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
+    # B19001_00 + i + E is a range of income variables in the acs5
+    FINAL_URL = BASE_URL \
+        + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
+        + FOR + COUNTY + "*" \
+        + IN + STATE + OREGON
+    r = requests.get(url=FINAL_URL + API_KEY)
+    values = r.json()
+    #labels
+    df[("200" if i < 10  else '20') + str(i)] = values
 # sheet = wb.worksheet_by_title('raw household income data')
 # # TODO drop row 0 in future. Keeping for now for refrence
 # sheet.set_dataframe(df, (1,1))
