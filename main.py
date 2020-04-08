@@ -1,6 +1,6 @@
 # This codebase is a rework of an original I worked on that pulled the data from the census, manually transformed it,
 # and stored it in excel. This new code gets user input for census acs years, pulls the data,
-# transforms with pandas (sooooo much easier), and saves to GSheets. With Tableau public (not desktop!),
+# transforms with pandas, and saves to GSheets. With Tableau public (not desktop!),
 # you can have your data automatically sync (every 24 hours it updates but can be done manually if needed sooner).
 # The goal here was to make things as hands off for the client as they aren't very technically proficient.
 # For questions, comments, concerns email taymal1987@gmail.com
@@ -67,6 +67,7 @@ GROSS_RENT_PERCENT_INCOME_35_39 = 'B25070_008E'
 GROSS_RENT_PERCENT_INCOME_40_49 = 'B25070_009E'
 GROSS_RENT_PERCENT_INCOME_50_PLUS = 'B25070_010E'
 TOTAL_POPULATION_BURDENED = 'B25070_001E'
+MED_INCOME = 'B06011_001E'
 
 
 COMMA = ','
@@ -103,7 +104,7 @@ FINAL_URL = BASE_URL \
 # df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # # pandas return copies so you must place it in a variable
 # df = df.drop([0])
-# wb = api.open('COIC-dashboard')
+wb = api.open('COIC-dashboard')
 # sheet = wb.worksheet_by_title('raw burden data')
 # sheet.set_dataframe(df, (1,1))
 
@@ -122,13 +123,11 @@ FINAL_URL = BASE_URL \
 # sheet.set_dataframe(trans_df, (1,1))
 
 
-# county_dict = {
-#     "013": "Crook",
-#     "017": "Deschutes",
-#     "031": "Jefferson"
-# }
-
-
+county_dict = {
+    "013": "Crook",
+    "017": "Deschutes",
+    "031": "Jefferson"
+}
 # # household_income is a dict of lists to store all income brackets ($10,000 to $14,999, $15,000 to $19,999,...$200,000+)
 # household_incomes = {}
 # for values in county_dict.values():
@@ -155,7 +154,7 @@ FINAL_URL = BASE_URL \
 #         # household_incomes[Marion].append(int(5690)
 #         # household_incom = {Marion: [5690]}
 #         household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
-# print(household_incomes)
+
 # df = pd.DataFrame.from_dict(household_incomes)
 # trans_df = df.transpose()
 # trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',	'$20,000 to $24,999',	'$25,000 to $29,999',	'$30,000 to $34,999',	'$35,000 to $39,999',	'$40,000 to $44,999',	'$45,000 to $49,999',	'$50,000 to $59,999',	'$60,000 to $74,999',	'$75,000 to $99,999',	'$100,000 to $124,999',	'$125,000 to $149,999',	'$150,000 to $199,999',	'$200,000 or more']
@@ -163,35 +162,63 @@ FINAL_URL = BASE_URL \
 # normalized_df = trans_df / trans_max
 # print(normalized_df)
 
-# counties_df = pd.DataFrame.from_dict(fips_codes, orient='index')
+# counties_df = pd.DataFrame.from_dict(county_dict, orient='index')
 # counties_df.columns = ['county']
 
-#gsheet
+# # gsheet
 # wb = api.open('COIC-dashboard')
 # sheet = wb.worksheet_by_title('viz household income data')
 # sheet.set_dataframe(counties_df, (1,1))
 # sheet.set_dataframe(normalized_df, (1,2))
 
-
-df = pd.DataFrame()
+trends = {}
+for values in county_dict.values():
+    trends[values] = []
 #historic rent burdening data used in linear regression viz
 for i in range(2011,2019):
     FINAL_URL =  URL + str(i) + '/' + DATA_SET\
     + GET + TOTAL_POPULATION_BURDENED + COMMA\
     + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
+    + GROSS_RENT_PERCENT_INCOME_25_30 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_30_34 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_35_39 + COMMA\
     + GROSS_RENT_PERCENT_INCOME_40_49\
-    + COMMA + MED_GROSS_RENT_DOLLARS\
+    + COMMA + MED_INCOME\
     + FOR + COUNTY + DESCHUTES + COMMA\
     + JEFFERSON + COMMA + CROOK \
     + IN + STATE + OREGON
 
     r = requests.get(url=FINAL_URL + API_KEY)
     values = r.json()
-    df[str(i)] = values
+    # print(values)
+    for i in range(1, len(values)):
+        trends[fips_codes[values[i][8]]].append(100 * (int(values[i][1])/int(values[i][0])))
+        trends[fips_codes[values[i][8]]].append(100 * ((int(values[i][2])) + (int(values[i][3])) + (int(values[i][4]) + (int(values[i][5]))))/int(values[i][0]))
+        trends[fips_codes[values[i][8]]].append(int(values[i][6]))
 
-# sheet = wb.worksheet_by_title('raw historic burdening data')
-# # TODO drop row 0 in future. Keeping for now for refrence
-# sheet.set_dataframe(df, (1,1))
+df = pd.DataFrame.from_dict(trends)
+trans_df = df.transpose()
+burden = trans_df.iloc[:, ::3]
+burden = burden.stack().reset_index()
+burden.rename(columns = {'level_0':'county', 0: 'rent burdened'}, inplace = True)
+severe_burden = trans_df.iloc[:, 1::3]
+severe_burden = severe_burden.stack().reset_index()
+severe_burden.rename(columns = {'level_0':'county', 0: 'severe rent burdened'}, inplace = True)
+med_income = trans_df.iloc[:, 2::3]
+med_income = med_income.stack().reset_index()
+med_income.rename(columns = {'level_0':'county', 0: 'median income'}, inplace = True)
+print(burden, severe_burden, med_income)
+
+final_df = pd.DataFrame(burden['rent burdened'])
+final_df['severe rent burdened'] = severe_burden['severe rent burdened']
+final_df['median income'] = med_income['median income']
+counties = ['Crook', 'Deschutes', 'Jefferson']
+county = [ele for ele in counties for _ in range(8)]
+final_df['county'] = county
+years = [i for i in range(2011, 2019)] * 3
+final_df['year'] = years
+
+sheet = wb.worksheet_by_title('viz historic rent data')
+sheet.clear()
+sheet.set_dataframe(final_df, (1,1))
     
