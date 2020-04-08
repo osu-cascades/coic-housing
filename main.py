@@ -9,6 +9,18 @@ import config
 import pygsheets
 import pandas as pd
 
+start_msg = '\n\nHello! This prompt will guide you through updating the current COIC dashboard. \
+All you need to do is input in a year, corresponding the current acs year you want,\
+press return, and then you\'re done!\n\n'
+
+main_acs_msg = 'what is the current years acs you would like to use? - e.x 2018\n\n\n'
+
+wait_msg = 'Please wait, this process may take a few minutes\n'
+
+print(start_msg)
+main_acs = input(main_acs_msg)
+print(wait_msg)
+
 #google auth stuff
 api = pygsheets.authorize()
 wb = api.open('COIC-dashboard')
@@ -106,7 +118,7 @@ df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25
 # pandas return copies so you must place it in a variable
 df = df.drop([0])
 
-
+# TODO overall description
 trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
 trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
 trans_df['PERCENT SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
@@ -155,16 +167,14 @@ for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
         # household_incom = {Marion: [5690]}
         household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
 
+# TODO overall description
 df = pd.DataFrame.from_dict(household_incomes)
 trans_df = df.transpose()
 trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',	'$20,000 to $24,999',	'$25,000 to $29,999',	'$30,000 to $34,999',	'$35,000 to $39,999',	'$40,000 to $44,999',	'$45,000 to $49,999',	'$50,000 to $59,999',	'$60,000 to $74,999',	'$75,000 to $99,999',	'$100,000 to $124,999',	'$125,000 to $149,999',	'$150,000 to $199,999',	'$200,000 or more']
 trans_max = trans_df.max().max()
 normalized_df = trans_df / trans_max
-print(normalized_df)
-
 counties_df = pd.DataFrame.from_dict(county_dict, orient='index')
 counties_df.columns = ['county']
-
 # gsheet
 wb = api.open('COIC-dashboard')
 sheet = wb.worksheet_by_title('viz household income data')
@@ -172,6 +182,7 @@ sheet.clear()
 sheet.set_dataframe(counties_df, (1,1))
 sheet.set_dataframe(normalized_df, (1,2))
 
+# TODO overall description
 trends = {}
 for values in county_dict.values():
     trends[values] = []
@@ -191,12 +202,13 @@ for i in range(2011,2019):
 
     r = requests.get(url=FINAL_URL + API_KEY)
     values = r.json()
-    # print(values)
     for i in range(1, len(values)):
         trends[fips_codes[values[i][8]]].append(100 * (int(values[i][1])/int(values[i][0])))
         trends[fips_codes[values[i][8]]].append(100 * ((int(values[i][2])) + (int(values[i][3])) + (int(values[i][4]) + (int(values[i][5]))))/int(values[i][0]))
         trends[fips_codes[values[i][8]]].append(int(values[i][6]))
 
+
+# TODO overall description
 df = pd.DataFrame.from_dict(trends)
 trans_df = df.transpose()
 burden = trans_df.iloc[:, ::3]
@@ -208,7 +220,6 @@ severe_burden.rename(columns = {'level_0':'county', 0: 'severe rent burdened'}, 
 med_income = trans_df.iloc[:, 2::3]
 med_income = med_income.stack().reset_index()
 med_income.rename(columns = {'level_0':'county', 0: 'median income'}, inplace = True)
-print(burden, severe_burden, med_income)
 
 final_df = pd.DataFrame(burden['rent burdened'])
 final_df['severe rent burdened'] = severe_burden['severe rent burdened']
@@ -222,4 +233,7 @@ final_df['year'] = years
 sheet = wb.worksheet_by_title('viz historic rent data')
 sheet.clear()
 sheet.set_dataframe(final_df, (1,1))
+
+end_msg = '\n\nAll finished! The vizualisation will either update within the next 24hrs or you can manually force the update within Tableau Public.\n\nGoodbye\n!'
+print(end_msg)
     
