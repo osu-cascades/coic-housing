@@ -11,6 +11,7 @@ import pandas as pd
 
 #google auth stuff
 api = pygsheets.authorize()
+wb = api.open('COIC-dashboard')
 
 fips_codes = {
     "001": "Baker",
@@ -85,7 +86,7 @@ JEFFERSON = '031'
 # FINAL_URL = https://api.census.gov/data/2018/acs/acs5?get=B25070_010E&for=county:*&in=state:41
 # this string will get the population of individuals that pay 30 - 50% of their income
 # in rent for all counties in oregon.
-# i.e. one list being ['5690', '41', '047'], meaning 5690 people spend 50% or more of 
+# i.e. one list being ['5690', '41', '047'], meaning 5690 people sampled spend 50% or more of 
 # their income on rent in the county 047 (FIPS code for Marion county) in the state 41 (FIPS code for Oregon)
 FINAL_URL = BASE_URL \
     + GET + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
@@ -104,10 +105,7 @@ df = pd.DataFrame(values)
 df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
 # pandas return copies so you must place it in a variable
 df = df.drop([0])
-wb = api.open('COIC-dashboard')
-sheet = wb.worksheet_by_title('raw burden data')
-sheet.clear()
-sheet.set_dataframe(df, (1,1))
+
 
 trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
 trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
