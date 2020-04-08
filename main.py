@@ -18,7 +18,7 @@ main_acs_msg = 'what is the current years acs you would like to use? - e.x 2018\
 wait_msg = 'Please wait, this process may take a few minutes\n'
 
 print(start_msg)
-main_acs = input(main_acs_msg)
+acs_year = input(main_acs_msg)
 print(wait_msg)
 
 #google auth stuff
@@ -67,7 +67,7 @@ fips_codes = {
 # API setup and variables
 API_KEY = config.CENSUS_API_KEY
 URL = 'https://api.census.gov/data/'
-YEAR = '2018/'
+YEAR = acs_year + '/'
 DATA_SET = 'acs/acs5'
 BASE_URL = URL + YEAR + DATA_SET
 GET = '?get='
@@ -187,7 +187,7 @@ trends = {}
 for values in county_dict.values():
     trends[values] = []
 #historic rent burdening data used in linear regression viz
-for i in range(2011,2019):
+for i in range(2011,int(acs_year) + 1):
     FINAL_URL =  URL + str(i) + '/' + DATA_SET\
     + GET + TOTAL_POPULATION_BURDENED + COMMA\
     + GROSS_RENT_PERCENT_INCOME_50_PLUS + COMMA\
@@ -225,15 +225,15 @@ final_df = pd.DataFrame(burden['rent burdened'])
 final_df['severe rent burdened'] = severe_burden['severe rent burdened']
 final_df['median income'] = med_income['median income']
 counties = ['Crook', 'Deschutes', 'Jefferson']
-county = [ele for ele in counties for _ in range(8)]
+county = [ele for ele in counties for _ in range(len(range(2011,int(acs_year) + 1)))]
 final_df['county'] = county
-years = [i for i in range(2011, 2019)] * 3
+years = [i for i in range(2011, int(acs_year) + 1)] * 3
 final_df['year'] = years
 
 sheet = wb.worksheet_by_title('viz historic rent data')
 sheet.clear()
 sheet.set_dataframe(final_df, (1,1))
 
-end_msg = '\n\nAll finished! The vizualisation will either update within the next 24hrs or you can manually force the update within Tableau Public.\n\nGoodbye\n!'
+end_msg = '\n\nAll finished! The vizualisation will either update within the next 24hrs or you can manually force the update within Tableau Public.\n\nGoodbye!\n'
 print(end_msg)
     
