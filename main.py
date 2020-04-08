@@ -97,30 +97,32 @@ FINAL_URL = BASE_URL \
     + FOR + COUNTY + '*'\
     + IN + STATE + OREGON
 
-# r = requests.get(url=FINAL_URL + API_KEY)
-# # values is the return value from the census  API
-# values = r.json()
-# df = pd.DataFrame(values)
-# df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
-# # pandas return copies so you must place it in a variable
-# df = df.drop([0])
+r = requests.get(url=FINAL_URL + API_KEY)
+# values is the return value from the census  API
+values = r.json()
+df = pd.DataFrame(values)
+df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34','GROSS_RENT_PERCENT_INCOME_35_39','GROSS_RENT_PERCENT_INCOME_40_49','TOTAL_POPULATION_BURDENED', 'state', 'county']
+# pandas return copies so you must place it in a variable
+df = df.drop([0])
 wb = api.open('COIC-dashboard')
-# sheet = wb.worksheet_by_title('raw burden data')
-# sheet.set_dataframe(df, (1,1))
+sheet = wb.worksheet_by_title('raw burden data')
+sheet.clear()
+sheet.set_dataframe(df, (1,1))
 
-# trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
-# trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
-# trans_df['PERCENT SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
-# # get percents from floats
-# trans_df['PERCENT SEVERLY RENT BURDENED'] = trans_df['PERCENT SEVERLY RENT BURDENED'] * 100
-# trans_df['PERCENT RENT BURDENED'] = trans_df['PERCENT RENT BURDENED'] * 100
+trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
+trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+trans_df['PERCENT SEVERLY RENT BURDENED'] = pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_50_PLUS']) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
+# get percents from floats
+trans_df['PERCENT SEVERLY RENT BURDENED'] = trans_df['PERCENT SEVERLY RENT BURDENED'] * 100
+trans_df['PERCENT RENT BURDENED'] = trans_df['PERCENT RENT BURDENED'] * 100
 
-# trans_df['COUNTY FIPS'] = df['county']
-# trans_df['COUNTY NAME'] = df['county'].map(fips_codes)
-# # #gsheet
-# wb = api.open('COIC-dashboard')
-# sheet = wb.worksheet_by_title('viz burden data')
-# sheet.set_dataframe(trans_df, (1,1))
+trans_df['COUNTY FIPS'] = df['county']
+trans_df['COUNTY NAME'] = df['county'].map(fips_codes)
+# #gsheet
+wb = api.open('COIC-dashboard')
+sheet = wb.worksheet_by_title('viz burden data')
+sheet.clear()
+sheet.set_dataframe(trans_df, (1,1))
 
 
 county_dict = {
@@ -128,48 +130,49 @@ county_dict = {
     "017": "Deschutes",
     "031": "Jefferson"
 }
-# # household_income is a dict of lists to store all income brackets ($10,000 to $14,999, $15,000 to $19,999,...$200,000+)
-# household_incomes = {}
-# for values in county_dict.values():
-#     household_incomes[values] = []
+# household_income is a dict of lists to store all income brackets ($10,000 to $14,999, $15,000 to $19,999,...$200,000+)
+household_incomes = {}
+for values in county_dict.values():
+    household_incomes[values] = []
 
-# NUM_HOUSEHOLD_INCOME_VARIABLES = 17
-# for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
-#     # B19001_00 + i + E is a range of income variables in the acs5
-#     FINAL_URL = BASE_URL \
-#         + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
-#         + FOR + COUNTY + CROOK + COMMA\
-#         + DESCHUTES + COMMA \
-#         + JEFFERSON\
-#         + IN + STATE + OREGON
+NUM_HOUSEHOLD_INCOME_VARIABLES = 17
+for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
+    # B19001_00 + i + E is a range of income variables in the acs5
+    FINAL_URL = BASE_URL \
+        + GET + ('B19001_00' if i < 10 else 'B19001_0') + str(i) + 'E' \
+        + FOR + COUNTY + CROOK + COMMA\
+        + DESCHUTES + COMMA \
+        + JEFFERSON\
+        + IN + STATE + OREGON
 
-#     r = requests.get(url=FINAL_URL + API_KEY)
-#     values = r.json()
-#     # get number of individuals in ith bracket and match with respective key
-#     for i in range(1, len(values)):
-#         # add to household_income the value which matches the fips value which matches the key in fips_codes
-#         # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
-#         # fips_codes[047] = Marion
-#         # int(values[1][0]) = 5690
-#         # household_incomes[Marion].append(int(5690)
-#         # household_incom = {Marion: [5690]}
-#         household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
+    r = requests.get(url=FINAL_URL + API_KEY)
+    values = r.json()
+    # get number of individuals in ith bracket and match with respective key
+    for i in range(1, len(values)):
+        # add to household_income the value which matches the fips value which matches the key in fips_codes
+        # household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
+        # fips_codes[047] = Marion
+        # int(values[1][0]) = 5690
+        # household_incomes[Marion].append(int(5690)
+        # household_incom = {Marion: [5690]}
+        household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
 
-# df = pd.DataFrame.from_dict(household_incomes)
-# trans_df = df.transpose()
-# trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',	'$20,000 to $24,999',	'$25,000 to $29,999',	'$30,000 to $34,999',	'$35,000 to $39,999',	'$40,000 to $44,999',	'$45,000 to $49,999',	'$50,000 to $59,999',	'$60,000 to $74,999',	'$75,000 to $99,999',	'$100,000 to $124,999',	'$125,000 to $149,999',	'$150,000 to $199,999',	'$200,000 or more']
-# trans_max = trans_df.max().max()
-# normalized_df = trans_df / trans_max
-# print(normalized_df)
+df = pd.DataFrame.from_dict(household_incomes)
+trans_df = df.transpose()
+trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',	'$20,000 to $24,999',	'$25,000 to $29,999',	'$30,000 to $34,999',	'$35,000 to $39,999',	'$40,000 to $44,999',	'$45,000 to $49,999',	'$50,000 to $59,999',	'$60,000 to $74,999',	'$75,000 to $99,999',	'$100,000 to $124,999',	'$125,000 to $149,999',	'$150,000 to $199,999',	'$200,000 or more']
+trans_max = trans_df.max().max()
+normalized_df = trans_df / trans_max
+print(normalized_df)
 
-# counties_df = pd.DataFrame.from_dict(county_dict, orient='index')
-# counties_df.columns = ['county']
+counties_df = pd.DataFrame.from_dict(county_dict, orient='index')
+counties_df.columns = ['county']
 
-# # gsheet
-# wb = api.open('COIC-dashboard')
-# sheet = wb.worksheet_by_title('viz household income data')
-# sheet.set_dataframe(counties_df, (1,1))
-# sheet.set_dataframe(normalized_df, (1,2))
+# gsheet
+wb = api.open('COIC-dashboard')
+sheet = wb.worksheet_by_title('viz household income data')
+sheet.clear()
+sheet.set_dataframe(counties_df, (1,1))
+sheet.set_dataframe(normalized_df, (1,2))
 
 trends = {}
 for values in county_dict.values():
