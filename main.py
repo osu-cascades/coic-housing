@@ -171,10 +171,14 @@ for i in range(2, NUM_HOUSEHOLD_INCOME_VARIABLES + 1):
 df = pd.DataFrame.from_dict(household_incomes)
 trans_df = df.transpose()
 trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',	'$20,000 to $24,999',	'$25,000 to $29,999',	'$30,000 to $34,999',	'$35,000 to $39,999',	'$40,000 to $44,999',	'$45,000 to $49,999',	'$50,000 to $59,999',	'$60,000 to $74,999',	'$75,000 to $99,999',	'$100,000 to $124,999',	'$125,000 to $149,999',	'$150,000 to $199,999',	'$200,000 or more']
-trans_max = trans_df.max().max()
-normalized_df = trans_df / trans_max
 counties_df = pd.DataFrame.from_dict(county_dict, orient='index')
 counties_df.columns = ['county']
+normalized_df = trans_df.apply(lambda x: x/x.max(), axis=1)
+
+# pretty print normalized data just for sanity
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+#     print(normalized_df)
+
 # gsheet
 wb = api.open('COIC-dashboard')
 sheet = wb.worksheet_by_title('viz household income data')
