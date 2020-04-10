@@ -13,7 +13,7 @@ start_msg = '\n\nHello! This prompt will guide you through updating the current 
 All you need to do is input in a year, corresponding the current acs year you want,\
 press return, and then you\'re done!\n\n'
 
-main_acs_msg = 'what is the current years acs you would like to use? - e.x 2018\n\n\n'
+main_acs_msg = 'what is the acs (most likely most recent acs year) you would like to use by year? - e.x 2018\n\n\n'
 
 wait_msg = 'Please wait, this process may take a few minutes\n'
 
