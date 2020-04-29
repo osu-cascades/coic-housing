@@ -23,9 +23,9 @@ def update_sheet():
         return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
 
-    # now = datetime.datetime.now()
-    # if acs_year > str(now.year):
-    #     return 'invalid year :('
+    now = datetime.datetime.now()
+    if acs_year > str(now.year):
+        return 'invalid year :('
     # google auth stuff
     api = pygsheets.authorize()
     wb = api.open('COIC-dashboard')
