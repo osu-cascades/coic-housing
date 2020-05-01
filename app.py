@@ -8,6 +8,7 @@ import requests
 import config
 import pygsheets
 import pandas as pd
+import os
 # import datetime
 
 
@@ -23,7 +24,7 @@ def home():
 @app.route('/update_gsheet', methods=['POST'])
 def update_sheet():
     data = request.args
-    if str(data['pword']) != str(config.PWORD):
+    if str(data['pword']) != str(os.environ['PWORD']):
         return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
 
