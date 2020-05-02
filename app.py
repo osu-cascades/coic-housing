@@ -10,7 +10,7 @@ import pygsheets
 import pandas as pd
 import os
 import datetime
-# import datetime
+import json
 
 
 from flask import Flask
@@ -33,7 +33,7 @@ def update_sheet():
     if acs_year > str(now.year):
         return 'invalid year :('
     # google auth stuff
-    api = pygsheets.authorize()
+    api = pygsheets.authorize(service_account_env_var=json.loads9os.environ['SERVICE_ACCOUNT']))
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
