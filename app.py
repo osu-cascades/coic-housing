@@ -33,7 +33,7 @@ def update_sheet():
     if acs_year > str(now.year):
         return 'invalid year :('
     # google auth stuff
-    api = pygsheets.authorize(os.environ['CLIENT_SCRET'])
+    api = pygsheets.authorize(client_secret=os.environ['CLIENT_SCRET'])
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
