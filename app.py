@@ -35,7 +35,7 @@ def update_sheet():
 
     # google auth stuff
     api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
-    # api.create('COIC-dashboard')
+    print(os.environ['SERVICE_ACCOUNT'])
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
