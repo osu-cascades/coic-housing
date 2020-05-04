@@ -34,7 +34,7 @@ def update_sheet():
         return 'invalid year :('
 
     # google auth stuff
-    api = pygsheets.authorize(service_account_env_var = json.loads(os.environ['SERVICE_ACCOUNT']))
+    api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
