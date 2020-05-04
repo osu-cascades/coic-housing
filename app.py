@@ -78,7 +78,7 @@ def update_sheet():
     }
 
     # API setup and variables
-    API_KEY = config.CENSUS_API_KEY
+    API_KEY = os.environ['CENSUS_API_KEY']
     URL = 'https://api.census.gov/data/'
     YEAR = acs_year + '/'
     DATA_SET = 'acs/acs5'
