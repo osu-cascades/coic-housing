@@ -34,7 +34,10 @@ def update_sheet():
         return 'invalid year :('
 
     # google auth stuff
-    api = pygsheets.authorize(service_account_env_var = os.environ['SERVICE_ACCOUNT'])
+    # this does not use os.environ['xxxx']
+    # bc pygsheets loads the file with json.loads(os.environ['xxxx'])
+    # so only the name of the heroku env var needs to be passed
+    api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
