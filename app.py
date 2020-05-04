@@ -35,6 +35,7 @@ def update_sheet():
 
     # google auth stuff
     return str(os.environ['SERVICE_ACCOUNT'])
+    return 'test'
     api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
 
