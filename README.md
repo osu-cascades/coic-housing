@@ -10,7 +10,7 @@ Matthew Barnes: mlbarnes04@gmail.com
 
 ## Getting Started
 * Make sure you have python 3 (Heroku is currently running 3.8), Anaconda (>= 4.6) and Git.
-* Clone the repo
+* Clone and `cd` into the repo
 * Create a new virtual enviroment with `conda create --name myenv && conda activate myenv`, substituting `myenv` with whatever enviroment name you choose.
 * Install dependencies with `conda install --file requirements.txt`
 * You are now ready to edit the files and push to Heroku, so long as you have access to the project.
