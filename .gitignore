@@ -1,3 +1,4 @@
 config.py
 *.xlsx
 *.json
+*.env
