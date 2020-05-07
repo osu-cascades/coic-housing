@@ -22,7 +22,7 @@ def home():
     return 'success'
 
 
-@app.route('/update_gsheet', methods=['POST'])
+@app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
     data = request.args
     if str(data['pword']) != str(os.environ['PWORD']):
