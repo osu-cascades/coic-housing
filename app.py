@@ -11,6 +11,8 @@ import pandas as pd
 import os
 import datetime
 import json
+from dotenv import load_dotenv
+load_dotenv()
 
 
 from flask import Flask
@@ -21,12 +23,11 @@ app = Flask(__name__)
 def home():
     return 'success'
 
-
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
     data = request.args
-    if str(data['pword']) != str(os.environ['PWORD']):
-        return 'womp womp, you dont know the password :('
+    # if str(data['pword']) != str(os.getenv['PWORD']):
+    #     return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
 
     now = datetime.datetime.now()
@@ -37,13 +38,11 @@ def update_sheet():
     # this does not use os.environ['xxxx']
     # bc pygsheets loads the file with json.loads(os.environ['xxxx'])
     # so only the name of the heroku env var needs to be passed
-    if(os.environ['ENV'] == 'dev'):
-        # TODO fix this. This should import the local env var for development env
-        api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        api = pygsheets.authorize(service_file = os.getenv('SERVICE_ACCOUNT'))
     else:
         api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
-
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
@@ -82,9 +81,12 @@ def update_sheet():
         "069": "Wheeler",
         "071": "Yamhill"
     }
-
     # API setup and variables
-    API_KEY = os.environ['CENSUS_API_KEY']
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        API_KEY = os.getenv('CENSUS_API_KEY')
+        print('api key', API_KEY)
+    else:
+        API_KEY = os.environ['CENSUS_API_KEY']
     URL = 'https://api.census.gov/data/'
     YEAR = acs_year + '/'
     DATA_SET = 'acs/acs5'
