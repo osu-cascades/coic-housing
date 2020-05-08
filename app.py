@@ -37,7 +37,11 @@ def update_sheet():
     # this does not use os.environ['xxxx']
     # bc pygsheets loads the file with json.loads(os.environ['xxxx'])
     # so only the name of the heroku env var needs to be passed
-    api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
+    if(os.environ['ENV'] == 'dev'):
+        # TODO fix this. This should import the local env var for development env
+        api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
+    else:
+        api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
 
     fips_codes = {
