@@ -1,4 +1,4 @@
 config.py
 *.xlsx
 *.json
-*.env
+*.env./_pycache_
