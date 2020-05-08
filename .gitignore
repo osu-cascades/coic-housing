@@ -1,4 +1,7 @@
+env/
+__pycache__/
 config.py
 *.xlsx
 *.json
 *.env./_pycache_
+*.env
