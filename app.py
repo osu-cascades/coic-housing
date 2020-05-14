@@ -11,6 +11,7 @@ import pandas as pd
 import os
 import datetime
 import json
+from flask import abort
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -33,7 +34,7 @@ def update_sheet():
     now = datetime.datetime.now()
     #oldest acceptable acs year is 2011, but validating with 2013 to maintain trends viz
     if int(acs_year) > now.year or int(acs_year) < 2013:
-        return 'invalid year :('
+        abort(422)
 
     # google auth stuff
     # this does not use os.environ['xxxx']
