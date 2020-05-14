@@ -16,7 +16,7 @@ Matthew Barnes: mlbarnes04@gmail.com
 
 
 ## Tips
-* Ensure you have proper enviroment variables configured. These are denoted in the code with `os.environ['SOME_ENV_VAR']`, except for the pygsheets authorization which just needs the key name. 
+* Ensure you have proper Heroku enviroment variables configured. These are denoted in the code with `os.environ['SOME_ENV_VAR']`, except for the pygsheets authorization which just needs the key name. 
 * The enviroment variables should be good to go and not need changing or updating. If they do, for some reason, those can be updated in Heroku either through the CLI or site. The 'SERVICE_ACCOUNT' enviroment variable is a JSON file, generated through the projects Google Developers page (https://console.developers.google.com/), and thrown directly into Heroku as an eviroment variable. If, for some reason, the project needs a new one, generate it through the above link, add the **entire** file as an enviroment variable, and then share access to the email address within the JSON file from the projects sheets page.
 * To view available conda virtual enviroments, run `conda  env list`
 * To leave the current conda virtual enviroment, run `conda deactivate`

@@ -31,7 +31,8 @@ def update_sheet():
     acs_year = str(data['year'])
 
     now = datetime.datetime.now()
-    if acs_year > str(now.year):
+    #oldest acceptable acs year is 2011, but validating with 2013 to maintain trends viz
+    if int(acs_year) > now.year or int(acs_year) < 2013:
         return 'invalid year :('
 
     # google auth stuff
