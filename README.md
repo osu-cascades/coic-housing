@@ -13,7 +13,7 @@ Matthew Barnes: mlbarnes04@gmail.com
 * Create a new virtual enviroment with `conda create --name myenv && conda activate myenv`, substituting `myenv` with whatever enviroment name you choose.
 * Install dependencies with `conda install --file requirements.txt`
 * For local development - **You will need a client_secret.json**. This is found through [here](https://console.developers.google.com/), under the account associated with this project. Click on the project (located in the upper left near the Google APIs logo), click `Crednetials`, click `OAuth 2.0 Client IDs`,  download the JSON file and change the file name to just `client_secret.json`. Place JSON file in the root of the directory.
-* For local development - In the directory you will find a  `.env.example` file. Run `mv .env.example .env`, then open `.env` in your prefered editor. The keys present in this file are correct but their values are not. Go to Heroku, select either the staging or production project, go find the enviroment variables and replace the values in the `.env` file with the associated values found on Heroku.
+* For local development - In the directory you will find a  `.env.example` file. Run `cp .env.example .env`, then open `.env` in your prefered editor. The keys present in this file are correct but their values are not. Go to Heroku, select either the staging or production project, go find the enviroment variables and replace the values in the `.env` file with the associated values found on Heroku.
 * For local development - In your console, run `FLASK_ENV=dev`.
 
 * You are now ready to edit the files and push to Heroku/development, so long as you have access to the project.
