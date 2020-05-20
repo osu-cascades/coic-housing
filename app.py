@@ -24,8 +24,11 @@ def home():
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
     data = request.args
-    # if str(data['pword']) != str(os.getenv['PWORD']):
-    #     return 'womp womp, you dont know the password :('
+
+    # if str(data['pword']) != str(os.getenv('PWORD')):
+    #     return abort(403)
+    print(os.getenv('PWORD'))
+    print(data['pword'])
     acs_year = str(data['year'])
 
     now = datetime.datetime.now()
@@ -42,6 +45,7 @@ def update_sheet():
     else:
         api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
+    return 'ay'
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
