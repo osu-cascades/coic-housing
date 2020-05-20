@@ -11,18 +11,15 @@ import pandas as pd
 import os
 import datetime
 import json
-from flask import abort
 from dotenv import load_dotenv
+from flask import Flask, abort, request, redirect
 load_dotenv()
 
-
-from flask import Flask
-from flask import request
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
-    return 'success'
+    return redirect('./index.html')
 
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
