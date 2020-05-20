@@ -15,6 +15,26 @@ from dotenv import load_dotenv
 from flask import Flask, abort, request, redirect
 load_dotenv()
 
+def pword_validate(pword):
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        if str(pword) != str(os.getenv('TESTING_PWORD')):
+            return '403'
+        return '200'
+    if str(pword) != str(os.getenv('PWORD')):
+        return abort(403)
+    return '200'
+
+def year_validate(year):
+    now = datetime.datetime.now()
+    #oldest acceptable acs year is 2011, but validating with 2013 to maintain trends viz
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        if int(year) > now.year - 1 or int(year) < 2013:
+            return '422'
+        return '200'
+    if int(year) > now.year - 1 or int(year) < 2013:
+        return abort(422)
+    return '200'
+
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
@@ -25,16 +45,9 @@ def home():
 def update_sheet():
     data = request.args
 
-    # if str(data['pword']) != str(os.getenv('PWORD')):
-    #     return abort(403)
-    print(os.getenv('PWORD'))
-    print(data['pword'])
+    pword_validate(str(data['pword']))
     acs_year = str(data['year'])
-
-    now = datetime.datetime.now()
-    #oldest acceptable acs year is 2011, but validating with 2013 to maintain trends viz
-    if int(acs_year) > now.year - 1 or int(acs_year) < 2013:
-        abort(422)
+    year_validate(acs_year)
 
     # google auth stuff
     # this does not use os.environ['xxxx']
