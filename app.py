@@ -58,7 +58,7 @@ def update_sheet():
     else:
         api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
     wb = api.open('COIC-dashboard')
-    return 'ay'
+
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
@@ -100,7 +100,6 @@ def update_sheet():
     # API setup and variables
     if(os.environ['FLASK_ENV'] == 'dev'):
         API_KEY = os.getenv('CENSUS_API_KEY')
-        print('api key', API_KEY)
     else:
         API_KEY = os.environ['CENSUS_API_KEY']
     URL = 'https://api.census.gov/data/'
