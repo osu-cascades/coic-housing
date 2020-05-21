@@ -29,6 +29,7 @@ Matthew Barnes: mlbarnes04@gmail.com
 * To leave the current conda virtual enviroment, run `conda deactivate`
 
 ### Links: 
+* Anaconda: https://docs.anaconda.com/anaconda/install/
 * Python: https://www.python.org/downloads/
 * Pandas: https://pandas.pydata.org/
 * pygsheets: https://pypi.org/project/gsheets/

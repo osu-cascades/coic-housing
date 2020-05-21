@@ -9,11 +9,13 @@ import config
 import pygsheets
 import pandas as pd
 import os
-# import datetime
 import json
 from dotenv import load_dotenv
-from flask import Flask, abort, request, redirect
-from update import Update
+from flask import Flask, abort, request, render_template
+from params import Params
+from census import Census
+from google import Google
+
 load_dotenv()
 
 
@@ -27,27 +29,31 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
-    return redirect('./index.html')
+    return render_template('index.html')
 
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
+    params = Params()
+    census = Census()
+    google  = Google()
+
     data = request.args
 
-    update = Update()
-    update.pword_validate(str(data['pword']))
-    acs_year = str(data['year'])
-    update.year_validate(acs_year)
+    params.pword_validate(str(data['pword']))
+    acs_year = int(data['year'])
+    params.year_validate(acs_year)
 
-    # google auth stuff
-    # this does not use os.environ['xxxx']
-    # bc pygsheets loads the file with json.loads(os.environ['xxxx'])
-    # so only the name of the heroku env var needs to be passed
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        api = pygsheets.authorize(service_file = os.getenv('SERVICE_ACCOUNT'))
-    else:
-        api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
-    wb = api.open('COIC-dashboard')
+    # if(os.environ['FLASK_ENV'] == 'dev'):
+    #     api = pygsheets.authorize(service_file = os.getenv('SERVICE_ACCOUNT'))
+    # else:
+    #     api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
+    # wb = api.open('COIC-dashboard')
 
+    # 'SERVICE_ACCOUNT' is the env var associated with the google service account
+    api = google.auth('SERVICE_ACCOUNT')
+    # 'COIC-dashboard' is the google sheets name
+    wb = google.open_workbook(api, 'COIC-dashboard')
+    return 'booty'
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
@@ -86,12 +92,8 @@ def update_sheet():
         "069": "Wheeler",
         "071": "Yamhill"
     }
-    # API setup and variables
-    # if(os.environ['FLASK_ENV'] == 'dev'):
-    #     API_KEY = os.getenv('CENSUS_API_KEY')
-    # else:
-    #     API_KEY = os.environ['CENSUS_API_KEY']
-    API_KEY = update.get_census_api_key()
+    
+    API_KEY = census.get_census_api_key()
     URL = 'https://api.census.gov/data/'
     YEAR = acs_year + '/'
     DATA_SET = 'acs/acs5'
