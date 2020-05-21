@@ -12,14 +12,14 @@ import os
 import datetime
 import json
 from dotenv import load_dotenv
-from flask import Flask, abort, request, redirect
+from flask import Flask, abort, request, render_template
 load_dotenv()
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
-    return redirect('./index.html')
+    return render_template('index.html')
 
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
