@@ -9,31 +9,19 @@ import config
 import pygsheets
 import pandas as pd
 import os
-import datetime
+# import datetime
 import json
 from dotenv import load_dotenv
 from flask import Flask, abort, request, redirect
+from update import Update
 load_dotenv()
 
-def pword_validate(pword):
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        if str(pword) != str(os.getenv('TESTING_PWORD')):
-            return '403'
-        return '200'
-    if str(pword) != str(os.getenv('PWORD')):
-        return abort(403)
-    return '200'
 
-def year_validate(year):
-    now = datetime.datetime.now()
-    #oldest acceptable acs year is 2011, but validating with 2013 to maintain trends viz
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        if int(year) > now.year - 1 or int(year) < 2013:
-            return '422'
-        return '200'
-    if int(year) > now.year - 1 or int(year) < 2013:
-        return abort(422)
-    return '200'
+# def get_census_api_key():
+#     if(os.environ['FLASK_ENV'] == 'dev'):
+#         return os.getenv('CENSUS_API_KEY')
+#     else:
+#         return os.environ['CENSUS_API_KEY']
 
 app = Flask(__name__)
 
@@ -45,9 +33,10 @@ def home():
 def update_sheet():
     data = request.args
 
-    pword_validate(str(data['pword']))
+    update = Update()
+    update.pword_validate(str(data['pword']))
     acs_year = str(data['year'])
-    year_validate(acs_year)
+    update.year_validate(acs_year)
 
     # google auth stuff
     # this does not use os.environ['xxxx']
@@ -98,10 +87,11 @@ def update_sheet():
         "071": "Yamhill"
     }
     # API setup and variables
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        API_KEY = os.getenv('CENSUS_API_KEY')
-    else:
-        API_KEY = os.environ['CENSUS_API_KEY']
+    # if(os.environ['FLASK_ENV'] == 'dev'):
+    #     API_KEY = os.getenv('CENSUS_API_KEY')
+    # else:
+    #     API_KEY = os.environ['CENSUS_API_KEY']
+    API_KEY = update.get_census_api_key()
     URL = 'https://api.census.gov/data/'
     YEAR = acs_year + '/'
     DATA_SET = 'acs/acs5'
