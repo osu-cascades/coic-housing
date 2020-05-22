@@ -36,12 +36,9 @@ def update_sheet():
     google  = Google()
 
     data = request.args
-<<<<<<< HEAD
-=======
     # if str(data['pword']) == str(os.getenv['PWORD']):
     #     return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
->>>>>>> 8afe7c5fa8561f012fc337a9c32cb50bccc2beb0
 
     params.pword_validate(str(data['pword']))
     acs_year = int(data['year']) #as int for validation
