@@ -19,12 +19,6 @@ from google import Google
 load_dotenv()
 
 
-# def get_census_api_key():
-#     if(os.environ['FLASK_ENV'] == 'dev'):
-#         return os.getenv('CENSUS_API_KEY')
-#     else:
-#         return os.environ['CENSUS_API_KEY']
-
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
@@ -44,16 +38,17 @@ def update_sheet():
     params.year_validate(acs_year)
     acs_year = str(acs_year) #as string for concatentation in query string
 
-    # if(os.environ['FLASK_ENV'] == 'dev'):
-    #     api = pygsheets.authorize(service_file = os.getenv('SERVICE_ACCOUNT'))
-    # else:
-    #     api = pygsheets.authorize(service_account_env_var = 'SERVICE_ACCOUNT')
-    # wb = api.open('COIC-dashboard')
-
     # 'SERVICE_ACCOUNT' is the env var associated with the google service account
     api = google.auth('SERVICE_ACCOUNT')
     # 'COIC-dashboard' is the google sheets name
-    wb = google.open_workbook(api, 'COIC-dashboard')
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        wb = google.open_workbook(api, 'COIC-dashboard')
+    elif(os.environ['FLASK_ENV'] == 'prod'):
+        wb = google.open_workbook(api, 'COIC-dashboard-production')
+    elif(os.environ['FLASK_ENV'] == 'staging'):
+        wb = google.open_workbook(api, 'COIC-dashboard-staging')
+    else:
+        wb = google.open_workbook(api, 'COIC-dashboard-testing')
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
