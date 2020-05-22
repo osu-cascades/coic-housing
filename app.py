@@ -36,8 +36,6 @@ def update_sheet():
     google  = Google()
 
     data = request.args
-    # if str(data['pword']) == str(os.getenv['PWORD']):
-    #     return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
 
     params.pword_validate(str(data['pword']))
@@ -45,23 +43,9 @@ def update_sheet():
     params.year_validate(acs_year)
     acs_year = str(acs_year) #as string for concatentation in query string
 
-    # 'SERVICE_ACCOUNT' is the env var associated with the google service account
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        api = google.auth('SERVICE_ACCOUNT_DEV')
-    elif(os.environ['FLASK_ENV'] == 'testing'):
-        api = google.auth('SERVICE_ACCOUNT_TESTING')
-    else: #staging and production
-        api = google.auth('SERVICE_ACCOUNT')
-        
-    # 'COIC-dashboard' is the google sheets name
-    if(os.environ['FLASK_ENV'] == 'dev'):
-        wb = google.open_workbook(api, 'COIC-dashboard-dev')
-    elif(os.environ['FLASK_ENV'] == 'prod'):
-        wb = google.open_workbook(api, 'COIC-dashboard-production')
-    elif(os.environ['FLASK_ENV'] == 'staging'):
-        wb = google.open_workbook(api, 'COIC-dashboard-staging')
-    else:
-        wb = google.open_workbook(api, 'COIC-dashboard-testing')
+    api =  google.auth('FLASK_ENV')
+    wb = google.open_workbook(api, 'FLASK_ENV')
+
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
@@ -157,8 +141,9 @@ def update_sheet():
     df = df.drop([0])
 
     # this df takes in all the populations of people rent  burdened (25-50% of income), sums them,
-    # and then divides the the sum by the total population of those surveyed to get
-    # the percentage of people burdened. 
+    # and then divides the sum by the total population of those surveyed to get
+    # the percentage of people burdened, multiplies that value by 100 to get a percent,
+    # and then maps the county name from the county  fips code. 
     trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
     trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(
         df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
