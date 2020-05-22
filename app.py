@@ -39,7 +39,13 @@ def update_sheet():
     acs_year = str(acs_year) #as string for concatentation in query string
 
     # 'SERVICE_ACCOUNT' is the env var associated with the google service account
-    api = google.auth('SERVICE_ACCOUNT')
+    if(os.environ['FLASK_ENV'] == 'dev'):
+        api = google.auth('SERVICE_ACCOUNT_DEV')
+    elif(os.environ['FLASK_ENV'] == 'testing'):
+        api = google.auth('SERVICE_ACCOUNT_TESTING')
+    else: #staging and production
+        api = google.auth('SERVICE_ACCOUNT')
+        
     # 'COIC-dashboard' is the google sheets name
     if(os.environ['FLASK_ENV'] == 'dev'):
         wb = google.open_workbook(api, 'COIC-dashboard-dev')
