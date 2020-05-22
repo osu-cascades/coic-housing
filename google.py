@@ -9,15 +9,18 @@ class Google(object):
 
     def auth(self, env):
         if(os.environ[env] == 'dev'):
-            api = self._auth('SERVICE_ACCOUNT_DEV')
+            api = self._auth(env, 'SERVICE_ACCOUNT_DEV')
         elif(os.environ[env] == 'testing'):
-            api = self._auth('SERVICE_ACCOUNT_TESTING')
+            api = self._auth(env, 'SERVICE_ACCOUNT_TESTING')
         else: #staging and production
-            api = self._auth('SERVICE_ACCOUNT')
+            api = self._auth(env, 'SERVICE_ACCOUNT')
         return api
 
-    def _auth(self, creds):
-        return pygsheets.authorize(service_file = os.getenv(creds))
+    def _auth(self, env, creds):
+        if(os.environ[env] == 'dev' or os.environ[env] == 'testing'):
+            return pygsheets.authorize(service_file = os.getenv(creds))
+        else: 
+            return pygsheets.authorize(service_account_env_var = os.environ(creds))
 
     def open_workbook(self, api, env):
         if(os.environ[env] == 'dev'):
