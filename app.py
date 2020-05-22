@@ -150,12 +150,15 @@ def update_sheet():
     # values is the return value from the census  API
     values = r.json()
     df = pd.DataFrame(values)
+    #headers for df
     df.columns = ['GROSS_RENT_PERCENT_INCOME_50_PLUS', 'GROSS_RENT_PERCENT_INCOME_25_30', 'GROSS_RENT_PERCENT_INCOME_30_34',
                   'GROSS_RENT_PERCENT_INCOME_35_39', 'GROSS_RENT_PERCENT_INCOME_40_49', 'TOTAL_POPULATION_BURDENED', 'state', 'county']
     # pandas return copies so you must place it in a variable
     df = df.drop([0])
 
-    # TODO overall description
+    # this df takes in all the populations of people rent  burdened (25-50% of income), sums them,
+    # and then divides the the sum by the total population of those surveyed to get
+    # the percentage of people burdened. 
     trans_df = pd.DataFrame(df['TOTAL_POPULATION_BURDENED'])
     trans_df['PERCENT RENT BURDENED'] = (pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_25_30']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_30_34']) + pd.to_numeric(
         df['GROSS_RENT_PERCENT_INCOME_35_39']) + pd.to_numeric(df['GROSS_RENT_PERCENT_INCOME_40_49'])) / pd.to_numeric(df['TOTAL_POPULATION_BURDENED'])
@@ -205,7 +208,8 @@ def update_sheet():
             # household_incom = {Marion: [5690]}
             household_incomes[fips_codes[values[i][2]]].append(int(values[i][0]))
 
-    # TODO overall description
+    # this df takes the previous request for household incomes and the normalizes those values
+    # this should maybe be changed  to  min/max normalization which is easy to do with the lambda
     df = pd.DataFrame.from_dict(household_incomes)
     trans_df = df.transpose()
     trans_df.columns = ['Less than $10,000',	'$10,000 to $14,999',	'$15,000 to $19,999',
@@ -216,17 +220,15 @@ def update_sheet():
     counties_df.columns = ['county']
     normalized_df = trans_df.apply(lambda x: x/x.max(), axis=1)
 
-    # pretty print normalized data just for sanity
-    # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-    #     print(normalized_df)
-
     # gsheet
     sheet = google.worksheet_by_title_wrapper(wb, 'viz household income data')
     google.clear_wrapper(sheet)
     google.set_dataframe_wrapper(sheet, counties_df, (1, 1))
     google.set_dataframe_wrapper(sheet, normalized_df, (1, 2))
 
-    # TODO overall description
+    # This request is a bit weird. The loop grabs rent burdening data from the ACS from 2011 to the date
+    # user supplies and then stores those values in a dictionary, with the county as the main key,
+    # years as subsequent child keys, and then the burdening info as the value
     trends = {}
     for values in county_dict.values():
         trends[values] = []
@@ -254,7 +256,6 @@ def update_sheet():
             trends[fips_codes[values[i][8]]].append(int(values[i][6]))
 
 
-    # TODO overall description
     df = pd.DataFrame.from_dict(trends)
     trans_df = df.transpose()
     burden = trans_df.iloc[:, ::3]
