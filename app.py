@@ -21,10 +21,14 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+    return render_template('dashboard.html')
+
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
     data = request.args
-    # if str(data['pword']) != str(os.getenv['PWORD']):
+    # if str(data['pword']) == str(os.getenv['PWORD']):
     #     return 'womp womp, you dont know the password :('
     acs_year = str(data['year'])
 
@@ -269,6 +273,6 @@ def update_sheet():
     sheet.clear()
     sheet.set_dataframe(final_df, (1, 1))
 
-    return 'we gucci'
+    return render_template('dashboard.html')
 if __name__ == '__main__':
     app.run()
