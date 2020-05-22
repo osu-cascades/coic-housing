@@ -42,7 +42,7 @@ def update_sheet():
     api = google.auth('SERVICE_ACCOUNT')
     # 'COIC-dashboard' is the google sheets name
     if(os.environ['FLASK_ENV'] == 'dev'):
-        wb = google.open_workbook(api, 'COIC-dashboard')
+        wb = google.open_workbook(api, 'COIC-dashboard-dev')
     elif(os.environ['FLASK_ENV'] == 'prod'):
         wb = google.open_workbook(api, 'COIC-dashboard-production')
     elif(os.environ['FLASK_ENV'] == 'staging'):

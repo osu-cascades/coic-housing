@@ -8,6 +8,8 @@ class Google(object):
     def auth(self, creds):
         if(os.environ['FLASK_ENV'] == 'dev'):
             api = pygsheets.authorize(service_file = os.getenv(creds))
+        elif(os.environ['FLASK_ENV'] == 'testing'):
+            api = pygsheets.authorize(service_file = os.getenv(creds))
         else:
             api = pygsheets.authorize(service_account_env_var = creds)
         return api
