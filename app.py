@@ -25,6 +25,10 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+    return render_template('dashboard.html')
+
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
     params = Params()
@@ -32,6 +36,12 @@ def update_sheet():
     google  = Google()
 
     data = request.args
+<<<<<<< HEAD
+=======
+    # if str(data['pword']) == str(os.getenv['PWORD']):
+    #     return 'womp womp, you dont know the password :('
+    acs_year = str(data['year'])
+>>>>>>> 8afe7c5fa8561f012fc337a9c32cb50bccc2beb0
 
     params.pword_validate(str(data['pword']))
     acs_year = int(data['year']) #as int for validation
@@ -276,6 +286,6 @@ def update_sheet():
     google.clear_wrapper(sheet)
     google.set_dataframe_wrapper(sheet, final_df, (1, 1))
 
-    return 'we gucci'
+    return render_template('dashboard.html')
 if __name__ == '__main__':
     app.run()
