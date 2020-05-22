@@ -6,6 +6,7 @@ from google import Google
 import pygsheets
 from pygsheets import authorize
 from pygsheets import client
+from pygsheets import spreadsheet
 
 
 class TestGSheet(unittest.TestCase):
@@ -18,10 +19,7 @@ class TestGSheet(unittest.TestCase):
         mock_authorize.return_value = client
         response = Google.auth(self, 'FAKE')
         self.assertEqual(response, mock_authorize.return_value)
-
-    @mock.patch('google.pygsheets.authorize.open')
-    def test_opens_worksheet(self, mock_open):
-        1  == 1
+        
 
 
 if __name__ == '__main__':

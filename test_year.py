@@ -16,20 +16,20 @@ class TestYear(unittest.TestCase):
 
     def test_correct_year(self):
         """
-        Test that it accepts correct year are returns nothing
+        Test that params accepts correct year and returns nothing
         """
         self.assertIsNone(self.params.year_validate(2013))
 
     def test_incorrect_year(self):
         """
-        Tests that it aborts (422 status) on year  < 2012
+        Tests that params aborts (422 status) on year  < 2012
         """
         with self.assertRaises(UnprocessableEntity):
             self.params.year_validate(2011)
 
     def test_non_ints_are_rejected(self):
         """
-        Test strings ('abc' as oppsed to '2012), objects, etc should be aborted
+        Test strings ('abc' as oppsed to '2012), objects, etc should be aborted by params
         """
         params = Params()
         # test string input

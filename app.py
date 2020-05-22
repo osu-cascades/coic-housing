@@ -40,8 +40,9 @@ def update_sheet():
     data = request.args
 
     params.pword_validate(str(data['pword']))
-    acs_year = int(data['year'])
+    acs_year = int(data['year']) #as int for validation
     params.year_validate(acs_year)
+    acs_year = str(acs_year) #as string for concatentation in query string
 
     # if(os.environ['FLASK_ENV'] == 'dev'):
     #     api = pygsheets.authorize(service_file = os.getenv('SERVICE_ACCOUNT'))
@@ -53,7 +54,6 @@ def update_sheet():
     api = google.auth('SERVICE_ACCOUNT')
     # 'COIC-dashboard' is the google sheets name
     wb = google.open_workbook(api, 'COIC-dashboard')
-    return 'booty'
     fips_codes = {
         "001": "Baker",
         "003": "Benton",
@@ -160,10 +160,9 @@ def update_sheet():
     trans_df['COUNTY FIPS'] = df['county']
     trans_df['COUNTY NAME'] = df['county'].map(fips_codes)
     # #gsheet
-    wb = api.open('COIC-dashboard')
-    sheet = wb.worksheet_by_title('viz burden data')
-    sheet.clear()
-    sheet.set_dataframe(trans_df, (1, 1))
+    sheet = google.worksheet_by_title_wrapper(wb, 'viz burden data')
+    google.clear_wrapper(sheet)
+    google.set_dataframe_wrapper(sheet, trans_df, (1, 1))
 
 
     county_dict = {
@@ -214,11 +213,10 @@ def update_sheet():
     #     print(normalized_df)
 
     # gsheet
-    wb = api.open('COIC-dashboard')
-    sheet = wb.worksheet_by_title('viz household income data')
-    sheet.clear()
-    sheet.set_dataframe(counties_df, (1, 1))
-    sheet.set_dataframe(normalized_df, (1, 2))
+    sheet = google.worksheet_by_title_wrapper(wb, 'viz household income data')
+    google.clear_wrapper(sheet)
+    google.set_dataframe_wrapper(sheet, counties_df, (1, 1))
+    google.set_dataframe_wrapper(sheet, normalized_df, (1, 2))
 
     # TODO overall description
     trends = {}
@@ -273,9 +271,9 @@ def update_sheet():
     years = [i for i in range(2011, int(acs_year) + 1)] * 3
     final_df['year'] = years
 
-    sheet = wb.worksheet_by_title('viz historic rent data')
-    sheet.clear()
-    sheet.set_dataframe(final_df, (1, 1))
+    sheet = google.worksheet_by_title_wrapper(wb, 'viz historic rent data')
+    google.clear_wrapper(sheet)
+    google.set_dataframe_wrapper(sheet, final_df, (1, 1))
 
     return 'we gucci'
 if __name__ == '__main__':
