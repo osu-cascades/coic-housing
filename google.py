@@ -30,7 +30,7 @@ class Google(object):
         elif(os.environ[env] == 'staging'):
             wb = self._open_workbook(api, 'COIC-dashboard-staging')
         else: 
-            wb = self._open_workbook('COIC-dashboard-production')
+            wb = self._open_workbook(api, 'COIC-dashboard-production')
         return wb
 
     def _open_workbook(self, api, book_name):    
