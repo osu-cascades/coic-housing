@@ -29,11 +29,11 @@ Matthew Barnes: mlbarnes04@gmail.com
 * To leave the current conda virtual enviroment, run `conda deactivate`
 
 ## App Structure
-This uses 4 different enviroments: development, testing, staging, and production. The home route ('/') is used for capturing and sending parameters to '/update_gsheets'. The general flow of the app is as follows:
+This app uses 4 different enviroments: development, testing, staging, and production. The home route ('/') is used for capturing and sending parameters to '/update_gsheets'. The general flow of the app is as follows:
 1. Recieve a GET resquest at `/update_gsheet`.
 2. Validate user provided password and year.
 3. Authorize with Google API using service account credentials. What get's passed for authorization depends on which enviroment you are in. Development and testing use a `.env`, while staging and production use environment variables stored in Heroku.
-4. Open Google Sheets workbook. There are 4 seperate workbooks, each corresponding to a seperate environment. The service credentials, and the sharing of the credentials email address from Google Sheets, dictates which workbook is opened.
+4. Open Google Sheets workbook. There are 4 seperate workbooks, each corresponding to a seperate environment. The service credentials, and the sharing of the email address (found within the service account file) from Google Sheets, dictates which workbook is opened.
 5. Build Census query string and perform request.
 6. Put response in Pandas dataframe and transform data.
 7. Open worksheet.
