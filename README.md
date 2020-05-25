@@ -29,7 +29,7 @@ Matthew Barnes: mlbarnes04@gmail.com
 * To leave the current conda virtual enviroment, run `conda deactivate`
 
 ## App Structure
-This uses 4 different enviroments: development, testing, staging, and production. The general flow of the app is as follows:
+This uses 4 different enviroments: development, testing, staging, and production. The home route ('/') is used for capturing and sending parameters to '/update_gsheets'. The general flow of the app is as follows:
 1. Recieve a GET resquest at `/update_gsheet`.
 2. Validate user provided password and year.
 3. Authorize with Google API using service account credentials. What get's passed for authorization depends on which enviroment you are in. Development and testing use a `.env`, while staging and production use environment variables stored in Heroku.
@@ -39,6 +39,8 @@ This uses 4 different enviroments: development, testing, staging, and production
 7. Open worksheet.
 8. Clear worksheet.
 9. Write to worksheet.
+10. Repeat for every worksheet.
+11. Render dashboard (update can take up to 24 hours to become visible unless forced from the Tableau Public website (not app)).
 
 
 ### Links: 
