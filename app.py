@@ -23,11 +23,11 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def home():
-    return render_template('index.html')
-
-@app.route('/dashboard', methods=['GET'])
-def dashboard():
     return render_template('dashboard.html')
+
+@app.route('/year-select', methods=['GET'])
+def dashboard():
+    return render_template('index.html')
 
 @app.route('/update_gsheet', methods=['GET'])
 def update_sheet():
