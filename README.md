@@ -1,7 +1,7 @@
 # Readme
 
 ## What
-This codebase is a Heroku hosted Flask app that pulls census, given a correct POST passing in a census American Community Survey (ACS) 5 year study, and updates a Google Sheets worksheet. On update  of this worksheet,a seperate Tableau dashboard is updated shoowing vizualitions of the current Sheets  values. 
+This codebase is a Heroku hosted Flask app that pulls census, given a correct POST passing in a census American Community Survey (ACS) 5 year study year (2012, 2015, 2018, etc), and updates a Google Sheets worksheet. On update  of this worksheet,a seperate Tableau dashboard is updated showing vizualitions of the current Sheets  values. 
 
 ## Who
 Taylor Malory: taymal1987@gmail.com    
